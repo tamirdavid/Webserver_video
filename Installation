@@ -1,0 +1,76 @@
+# Install and activate nginx web server
+sudo apt update
+sudo apt install nginx -y
+sudo ufw allow 'Nginx HTTP'
+http://server_domain_or_IP - > check it
+
+
+# Install and check mysql server
+sudo apt install mysql-server
+sudo mysql
+CREATE DATABASE example_database;
+exit
+
+
+# install and check php
+sudo apt install php-fpm php-mysql
+
+sudo mkdir /var/www/tamir
+
+sudo chown -R $USER:$USER /var/www/tamir
+
+sudo nano /etc/nginx/sites-available/tamir
+
+server {
+    listen 80;
+    server_name tamir www.tamir;
+    root /var/www/tamir;
+
+    index index.html index.htm index.php;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+     }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+}
+
+
+
+sudo ln -s /etc/nginx/sites-available/tamir /etc/nginx/sites-enabled/
+sudo unlink /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl reload nginx
+nano /var/www/tamir/index.html
+
+<html>
+  <head>
+    <title>Tamir website</title>
+  </head>
+  <body>
+    <h1>Hello World, its tamir from example</h1>
+
+    <p>This is the landing page of <strong>your_domain</strong>.</p>
+  </body>
+</html>
+
+
+http://server_domain_or_IP
+
+
+nano /var/www/tamir/info.php
+
+<?php
+phpinfo();
+
+http://server_domain_or_IP/info.php
+
+sudo rm /var/www/your_domain/info.php
